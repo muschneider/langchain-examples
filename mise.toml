@@ -4,6 +4,6 @@ python = "3.14.3"
 uv = "latest"
 
 [env]
-# Replicates the core logic of 'source .venv/bin/activate.fish'
-VIRTUAL_ENV = "{{config_root}}/.venv"
-PATH = "{{config_root}}/.venv/bin:{{env.PATH}}"
+# Auto-activates .venv on cd into this directory (sets VIRTUAL_ENV + PATH).
+# `create = true` will create the venv via uv if it doesn't exist yet.
+_.python.venv = { path = ".venv", create = true }

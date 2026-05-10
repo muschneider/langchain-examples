@@ -1,36 +1,38 @@
 import os
 from dotenv import load_dotenv
-
-from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
-llm = ChatOpenAI(
-    model=os.getenv("OPENCODE_ZEN_MODEL", "minimax-m2.5-free"),
-    api_key=os.environ["OPENCODE_ZEN_API_KEY"],
-    base_url="https://opencode.ai/zen/v1",
-    temperature=0.2,
-)
 
-prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            "You are a senior software engineer. Answer with simple and practical code.",
-        ),
-        ("human", "{question}"),
-    ]
-)
+def main():
+    print("Hello from langchain")
 
-chain = prompt | llm | StrOutputParser()
+    information = """
+        You are a senior software engineer. Answer with simple and practical code.  
+    """
 
-response = chain.invoke(
-    {
-        "question": "Give me a simple Spark Scala example that reads Parquet and counts rows."
-    }
-)
+    summary_template = """
+        Give me a simple Spark Scala example that reads Parquet and counts rows.
+    """
 
-print(response)
+    summary_prompt_template = PromptTemplate(
+        input_variables=["information"], template=summary_template
+    )
+
+    llm = ChatOpenAI(
+        model=os.getenv("OPENCODE_ZEN_MODEL", "minimax-m2.5-free"),
+        api_key=os.environ["OPENCODE_ZEN_API_KEY"],
+        base_url="https://opencode.ai/zen/v1",
+        temperature=0.4,
+    )
+
+    chain = summary_prompt_template | llm
+
+    response = chain.invoke(input={"information": information})
+    print(response.content)
+
+
+if __name__ == "__main__":
+    main()
