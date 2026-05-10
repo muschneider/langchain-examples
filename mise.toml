@@ -1,0 +1,9 @@
+# Computer Science Algorithms Example in Python
+[tools]
+python = "3.14.3"
+uv = "latest"
+
+[env]
+# Replicates the core logic of 'source .venv/bin/activate.fish'
+VIRTUAL_ENV = "{{config_root}}/.venv"
+PATH = "{{config_root}}/.venv/bin:{{env.PATH}}"
