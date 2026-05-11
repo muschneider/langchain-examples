@@ -1,6 +1,6 @@
-# LangChain Course
+# LangChain Examples
 
-A small Python learning project for experimenting with LangChain agents, OpenAI-compatible chat models, Playwright-powered web search, and Tavily search. The repository contains standalone examples rather than a packaged application, so each script can be run independently while following the course exercises.
+A small Python learning project for experimenting with LangChain agents, OpenAI-compatible chat models, Playwright-powered web search, and Tavily search. The repository contains standalone examples rather than a packaged application, so each script can be run independently.
 
 ## Tech Stack
 
