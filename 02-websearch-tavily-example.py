@@ -1,3 +1,5 @@
+# https://docs.langchain.com/oss/python/langchain/agents
+# https://docs.langchain.com/oss/python/langchain/tools
 import os
 from dotenv import load_dotenv
 
