@@ -133,6 +133,8 @@ def web_search_with_playwright(query: str, max_results: int = 5) -> str:
     """
     results = playwright_duckduckgo_search(query=query, max_results=max_results)
 
+    print(f"Search query: {query}")
+
     return json.dumps(results, indent=2, ensure_ascii=False)
 
 
