@@ -3,12 +3,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from langchain.chat_models import init_chat_model
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
 from langsmith import traceable
 from langchain_openai import ChatOpenAI
-
 
 MAX_ITERATIONS = 10
 
@@ -16,7 +14,7 @@ MAX_ITERATIONS = 10
 @tool
 def get_product_price(product: str) -> float:
     """Look up the price of a product in the catalog."""
-    print(f"    >> Executing get_product_price(product='{product}')")
+    print(f"\n\n    >> Executing get_product_price(product='{product}')")
     prices = {"laptop": 1299.99, "headphones": 149.95, "keyboard": 89.50}
     return prices.get(product, 0)
 
@@ -26,16 +24,24 @@ def apply_discount(price: float, discount_tier: str) -> float:
     """Apply a discount tier to a price and return the final price.
     Available tiers: bronze, silver, gold."""
     print(
-        f"    >> Executing apply_discount(price={price}, discount_tier='{discount_tier}')"
+        f"\n\n    >> Executing apply_discount(price={price}, discount_tier='{discount_tier}')"
     )
     discount_percentages = {"bronze": 5, "silver": 12, "gold": 23}
     discount = discount_percentages.get(discount_tier, 0)
     return round(price * (1 - discount / 100), 2)
 
 
+def print_llm_prompt(messages):
+    print("\n\n\n\n")
+    print(">" * 60)
+    print("\n----- Messages to LLM ------------ \n")
+    for msg in messages:
+        print(f"{msg.type}: {msg.content}")
+    print("<" * 60)
+    print("\n\n\n\n")
+
+
 # --- Agent Loop ---
-
-
 @traceable(name="LangChain Agent Loop")
 def run_agent(question: str):
     tools = [get_product_price, apply_discount]
@@ -77,13 +83,14 @@ def run_agent(question: str):
     for iteration in range(1, MAX_ITERATIONS + 1):
         print(f"\n--- Iteration {iteration} ---")
 
+        print_llm_prompt(messages)
         ai_message = llm_with_tools.invoke(messages)
 
         tool_calls = ai_message.tool_calls
 
         # If no tool calls, this is the final answer
         if not tool_calls:
-            print(f"\nFinal Answer: {ai_message.content}")
+            print(f"\n\n\nFinal Answer: {ai_message.content}")
             return ai_message.content
 
         # Process only the FIRST tool call — force one tool per iteration
@@ -92,7 +99,7 @@ def run_agent(question: str):
         tool_args = tool_call.get("args", {})
         tool_call_id = tool_call.get("id")
 
-        print(f"  [Tool Selected] {tool_name} with args: {tool_args}")
+        print(f"\n\n  [Tool Selected] {tool_name} with args: {tool_args}")
 
         tool_to_use = tools_dict.get(tool_name)
         if tool_to_use is None:
@@ -100,7 +107,7 @@ def run_agent(question: str):
 
         observation = tool_to_use.invoke(tool_args)
 
-        print(f"  [Tool Result] {observation}")
+        print(f"\n\n  [Tool Result] {observation}")
 
         messages.append(ai_message)
         messages.append(
@@ -113,5 +120,6 @@ def run_agent(question: str):
 
 if __name__ == "__main__":
     print("Hello LangChain Agent (.bind_tools)!")
+    os.system("cls" if os.name == "nt" else "clear")
     print()
     result = run_agent("What is the price of a laptop after applying a gold discount?")

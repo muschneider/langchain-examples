@@ -52,8 +52,9 @@ def _post_json(path: str, payload: dict, timeout: float) -> dict:
     return response.json()
 
 
+# def web_search(query: str, max_results: int = 3, provider: str = "brave") -> str:
 @tool(args_schema=WebSearchInput)
-def web_search(query: str, max_results: int = 3, provider: str = "brave") -> str:
+def web_search(query: str, max_results: int = 3, provider: str = "duckduckgo") -> str:
     """Use this tool first when the user asks a research question and you need to discover relevant web pages. It returns ranked JSON search results with title, URL, snippet, rank, and source. Do not use snippets as final evidence when the user needs source-grounded analysis; call `web_extract` on the best URLs next."""
     payload = _post_json(
         "/search",
@@ -64,6 +65,8 @@ def web_search(query: str, max_results: int = 3, provider: str = "brave") -> str
         },
         timeout=30.0,
     )
+
+    print(f"\n\n @@@>> web_search tool called - query:'{query}'")
 
     compact_results = [
         {
@@ -107,6 +110,8 @@ def web_extract(
     markdown = payload.get("markdown", "")
     max_markdown_chars = 5000
 
+    print(f"\n\n --->> web_extract tool called - url: '{url}'")
+
     return json.dumps(
         {
             "url": payload["url"],
@@ -124,18 +129,18 @@ def web_extract(
 
 
 def main() -> None:
-    # llm = ChatOpenAI(
-    #    model="openai/gpt-oss-120b:free",
-    #    api_key=os.environ["OPENROUTER_API_KEY"],
-    #    base_url="https://openrouter.ai/api/v1",
-    #    temperature=0,
-    # )
     llm = ChatOpenAI(
         model=os.getenv("OPENCODE_ZEN_MODEL", "minimax-m2.5-free"),
         api_key=os.environ["OPENCODE_ZEN_API_KEY"],
         base_url="https://opencode.ai/zen/v1",
         temperature=0.4,
     )
+    # llm = ChatOpenAI(
+    #     model="google/gemma-4-31b-it:free",
+    #     api_key=os.environ["OPENROUTER_API_KEY"],
+    #     base_url="https://openrouter.ai/api/v1",
+    #     temperature=0.4,
+    # )
 
     tools = [web_search, web_extract]
 
@@ -158,9 +163,9 @@ def main() -> None:
                 {
                     "role": "user",
                     "content": (
-                        "Use web_search to find pages about FastAPI background tasks. "
+                        "Use web_search to find pages about MetricStore. "
                         "Then use web_extract on the top 2 useful URLs and explain when "
-                        "background tasks should be used. Cite URLs."
+                        "and how MetricStore should be used. Cite URLs."
                     ),
                 }
             ]
@@ -168,8 +173,10 @@ def main() -> None:
     )
 
     # print(response["messages"])
+    print("\n\n")
     print(response["messages"][-1].content)
 
 
 if __name__ == "__main__":
+    os.system("cls" if os.name == "nt" else "clear")
     main()

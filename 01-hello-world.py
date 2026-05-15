@@ -21,18 +21,18 @@ def main():
         input_variables=["information"], template=summary_template
     )
 
-    # llm = ChatOpenAI(
-    #    model=os.getenv("OPENCODE_ZEN_MODEL", "minimax-m2.5-free"),
-    #    api_key=os.environ["OPENCODE_ZEN_API_KEY"],
-    #    base_url="https://opencode.ai/zen/v1",
-    #    temperature=0.4,
-    # )
     llm = ChatOpenAI(
-        model="google/gemma-4-31b-it:free",
-        api_key=os.environ["OPENROUTER_API_KEY"],
-        base_url="https://openrouter.ai/api/v1",
+        model=os.getenv("OPENCODE_ZEN_MODEL", "minimax-m2.5-free"),
+        api_key=os.environ["OPENCODE_ZEN_API_KEY"],
+        base_url="https://opencode.ai/zen/v1",
         temperature=0.4,
     )
+    # llm = ChatOpenAI(
+    #     model="google/gemma-4-31b-it:free",
+    #     api_key=os.environ["OPENROUTER_API_KEY"],
+    #     base_url="https://openrouter.ai/api/v1",
+    #     temperature=0.4,
+    # )
 
     chain = summary_prompt_template | llm
 
